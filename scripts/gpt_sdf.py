@@ -21,20 +21,23 @@ def save_to_json(filename, data):
 #             return False
 #     return True
 
-model = "gpt-3.5-turbo"
+# ==============================================================================
+# 🚀 核心配置区：本地 Ollama vs 云端大模型 双通道切换
+# ==============================================================================
+USE_CLOUD_API = False  # 设为 False 默认使用本地 3060 显卡
 
-if model == "gpt-3.5-turbo":
-    json_filename = "sdf_ds_3.5-turbo.json"
-if model == "gpt-4-turbo":
-    json_filename = "sdf_ds_4.json"
+if USE_CLOUD_API:
+    openai.api_base = "https://api.deepseek.com/v1"
+    openai.api_key = "sk-请在此处替换为你的云端API_KEY" 
+    CURRENT_MODEL = "deepseek-coder"
+else:
+    openai.api_base = "http://localhost:11434/v1"
+    openai.api_key = "ollama"  
+    CURRENT_MODEL = "qwen2.5-coder:7b" 
+# ==============================================================================
 
+json_filename = "sdf_ds_custom.json"
 sdf_data = load_or_create_json(json_filename)
-
-
-openai.api_base = "http://localhost:11434/v1"
-openai.api_key = "ollama"
-# OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-# openai.api_key = OPENAI_API_KEY
 
 gpt4_input = """Generate 3D meshes based on SDFs (signed distance functions) with this examples:
 

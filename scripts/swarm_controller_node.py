@@ -7,7 +7,7 @@ import rospy
 from sdf import box, sphere, write_binary_stl, rounded_box, capsule
 from sdf import generate
 from apf_controller import APFSwarmController
-from gpt_sdf import SDFDialog, SDFModel
+from gpt_sdf import SDFDialog, SDFModel, CURRENT_MODEL
 import threading
 import os
 import time
@@ -33,14 +33,16 @@ class SwarmControllerNode():
             return str(default_val)
 
     def __init__(self, goals=[]) -> None:
-        # ⚛️ 专属启动界面优化：更具学术与工程质感
+        # ⚛️ 替换为 ATOM-UAV 的专属启动界面
         print("\n" + "═"*65)
         print("   ⚛️  ATOM-UAV Swarm Control Framework Initializing...")
         print("   (Adaptive Topology & Operations Management)")
         print("   -------------------------------------------------")
+        # 👇 新增下面这一行，动态显示大模型名称
+        print(f"   [Loaded] LLM : {CURRENT_MODEL} (Shape Generation Engine)") 
         print("   [Loaded] FMS : Dynamic Fleet Management System")
         print("   [Loaded] SRM : Safe Return & Ground Lock Module")
-        print("   [Loaded] ATO : Adaptive Trajectory Optimization (Standby)")
+        print("   [Standby] ATO: Adaptive Trajectory Optimization")
         print("═"*65)
         sys.stdout.flush()
         
