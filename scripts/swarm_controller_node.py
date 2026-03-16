@@ -33,16 +33,16 @@ class SwarmControllerNode():
             return str(default_val)
 
     def __init__(self, goals=[]) -> None:
-        # ⚛️ 替换为 ATOM-UAV 的专属启动界面
+        # ⚛️ 替换为 ARES 的专属启动界面
         print("\n" + "═"*65)
-        print("   ⚛️  ATOM-UAV Swarm Control Framework Initializing...")
-        print("   (Adaptive Topology & Operations Management)")
+        print("   ⚛️  ARES Swarm Control Framework Initializing...")
+        print("   (Autonomous Resilient & Elastic Swarm)")
         print("   -------------------------------------------------")
         # 👇 新增下面这一行，动态显示大模型名称
         print(f"   [Loaded] LLM : {CURRENT_MODEL} (Shape Generation Engine)") 
         print("   [Loaded] FMS : Dynamic Fleet Management System")
         print("   [Loaded] SRM : Safe Return & Ground Lock Module")
-        print("   [Standby] ATO: Adaptive Trajectory Optimization")
+        print("   [Standby] DCA: Dynamic Configuration Assignment")
         print("═"*65)
         sys.stdout.flush()
         
@@ -61,30 +61,30 @@ class SwarmControllerNode():
 
         print("\n" + "━"*60)
         print("--- ⚙️ Algorithm Module Configuration ---")
-        module_input = self.get_input(">>> [ATO] Enable Adaptive Trajectory Optimization? [y/N]: ", "n")
-        self.enable_ato = True if module_input.lower() == 'y' else False
+        module_input = self.get_input(">>> [DCA] Enable Dynamic Configuration Assignment? [y/N]: ", "n")
+        self.enable_dca = True if module_input.lower() == 'y' else False
         
         # 🎯 动态安全基线设定
         self.safety_baseline = 0.3
-        if self.enable_ato:
-            sb_input = self.get_input(">>> [ATO] Set Safety Baseline Distance (0.2 - 0.5m, Default 0.3m): ", "0.3")
+        if self.enable_dca:
+            sb_input = self.get_input(">>> [DCA] Set Safety Baseline Distance (0.2 - 0.5m, Default 0.3m): ", "0.3")
             try:
                 val = float(sb_input)
                 if 0.2 <= val <= 0.5:
                     self.safety_baseline = val
                 else:
-                    print(f"[!] [ATO] Out of bounds ({val}). Defaulting to 0.3m.")
+                    print(f"[!] [DCA] Out of bounds ({val}). Defaulting to 0.3m.")
             except ValueError:
-                print("[!] [ATO] Invalid input. Defaulting to 0.3m.")
+                print("[!] [DCA] Invalid input. Defaulting to 0.3m.")
         
         timestamp = time.strftime("%Y%m%d_%H%M%S")
         base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        self.save_dir = os.path.join(base_dir, 'ATO-result', timestamp)
+        self.save_dir = os.path.join(base_dir, 'DCA-result', timestamp)
         os.makedirs(self.save_dir, exist_ok=True)
         
         print("\n" + "="*60)
-        print(f"[*] [ATOM-UAV] Mode: ATO Enabled = {self.enable_ato}")
-        print(f"[*] [ATOM-UAV] Safety Baseline : {self.safety_baseline}m")
+        print(f"[*] [ARES] Mode: DCA Enabled = {self.enable_dca}")
+        print(f"[*] [ARES] Safety Baseline : {self.safety_baseline}m")
         print(f"[*] [FMS] Fleet Capacity: {self.fleet_capacity} drones (Simulating...)")
         print("="*60 + "\n")
         sys.stdout.flush()
@@ -97,7 +97,7 @@ class SwarmControllerNode():
         
         self.controller = APFSwarmController(max_vel=1, min_dist=self.safety_baseline)
         self.controller.log_dir = self.save_dir 
-        self.controller.enable_ato = self.enable_ato
+        self.controller.enable_dca = self.enable_dca
         
         self.model = SDFModel()
         self.dialog = SDFDialog()
@@ -180,7 +180,7 @@ class SwarmControllerNode():
 
     def execute_return_sequence(self):
         if self.home_poses is None:
-            print("🛑 [ATOM-UAV] Shutting down system...")
+            print("🛑 [ARES] Shutting down system...")
             sys.stdout.flush()
             rospy.signal_shutdown("User exit")
             return
@@ -197,7 +197,7 @@ class SwarmControllerNode():
         
         self.get_input("\n>>> [SRM] Press 'Enter' when all drones have landed safely to power off...", "")
         self.is_running = False
-        print("🛑 [ATOM-UAV] System powered off successfully.")
+        print("🛑 [ARES] System powered off successfully.")
         sys.stdout.flush()
         rospy.signal_shutdown("Experiment finished")
 
@@ -213,13 +213,13 @@ class SwarmControllerNode():
                 print("[!] [FMS] Invalid number. Setting to 10.")
                 self.shape_drones = 10
                 
-            user_input = self.get_input(f">>> [ATOM-UAV] What to build with {self.shape_drones} drones? (e.g., sphere) [type 'exit' to quit]: \n", "exit")
+            user_input = self.get_input(f">>> [ARES] What to build with {self.shape_drones} drones? (e.g., sphere) [type 'exit' to quit]: \n", "exit")
             if user_input.lower() in ['exit', 'quit']:
                 self.execute_return_sequence() 
                 break
             
             shape_name = user_input.replace(" ", "_")
-            mode_str = "ATO" if self.enable_ato else "Base"
+            mode_str = "DCA" if self.enable_dca else "Base"
             
             # 💡 将安全基线嵌入文件名，供比对脚本读取
             sd_str = f"_SD{self.controller.min_dist:.2f}"
@@ -238,40 +238,40 @@ class SwarmControllerNode():
             else:
                 print(f"[*] [FMS] Seamless Morphing: All {self.shape_drones} airborne drones transitioning to new shape.")
                 
-            print(f"[*] [ATOM-UAV] Deploying '{shape_name}' (Log: {self.controller.current_log_name}.csv)...")
+            print(f"[*] [ARES] Deploying '{shape_name}' (Log: {self.controller.current_log_name}.csv)...")
             sys.stdout.flush()
 
-            self.get_input("\n>>> [ATOM-UAV] Press 'Enter' when formation is complete to generate individual plots...", "")
+            self.get_input("\n>>> [ARES] Press 'Enter' when formation is complete to generate individual plots...", "")
             self.is_running = False 
             
             self.controller.generate_plots()
             
-            cont = self.get_input("\n>>> [ATOM-UAV] Do you want to try another shape? (y/n): ", "n")
+            cont = self.get_input("\n>>> [ARES] Do you want to try another shape? (y/n): ", "n")
             if cont.lower() != 'y':
                 self.execute_return_sequence() 
                 break
 
             print("\n" + "━"*60)
             print("--- ⚙️ Algorithm Module Configuration (New Round) ---")
-            module_input = self.get_input(f">>> [ATO] Enable Adaptive Trajectory Optimization? (Current: {self.enable_ato}) [y/N]: ", "n")
-            self.enable_ato = True if module_input.lower() == 'y' else False
-            self.controller.enable_ato = self.enable_ato
+            module_input = self.get_input(f">>> [DCA] Enable Dynamic Configuration Assignment? (Current: {self.enable_dca}) [y/N]: ", "n")
+            self.enable_dca = True if module_input.lower() == 'y' else False
+            self.controller.enable_dca = self.enable_dca
 
             # 🎯 循环中的动态安全基线更新
-            if self.enable_ato:
-                sb_input = self.get_input(f">>> [ATO] Set Safety Baseline Distance (0.2 - 0.5m, Current: {self.controller.min_dist}m): ", str(self.controller.min_dist))
+            if self.enable_dca:
+                sb_input = self.get_input(f">>> [DCA] Set Safety Baseline Distance (0.2 - 0.5m, Current: {self.controller.min_dist}m): ", str(self.controller.min_dist))
                 try:
                     val = float(sb_input)
                     if 0.2 <= val <= 0.5:
                         self.controller.min_dist = val
                     else:
-                        print(f"[!] [ATO] Out of bounds. Keeping {self.controller.min_dist}m.")
+                        print(f"[!] [DCA] Out of bounds. Keeping {self.controller.min_dist}m.")
                 except ValueError:
-                    print(f"[!] [ATO] Invalid input. Keeping {self.controller.min_dist}m.")
+                    print(f"[!] [DCA] Invalid input. Keeping {self.controller.min_dist}m.")
             else:
                 self.controller.min_dist = 0.3 # Baseline 强制锁死 0.3
 
-            print(f"[*] [ATOM-UAV] Mode updated: ATO Enabled={self.enable_ato}, Safety Baseline={self.controller.min_dist}m")
+            print(f"[*] [ARES] Mode updated: DCA Enabled={self.enable_dca}, Safety Baseline={self.controller.min_dist}m")
             sys.stdout.flush()
 
             self.goals = []          

@@ -8,9 +8,9 @@ import datetime
 import numpy as np
 
 def get_all_csv_files(limit=30):
-    """全局搜索 result 文件夹，按生成时间倒序列出最近的 CSV 文件"""
+    """全局搜索 DCA-result 文件夹，按生成时间倒序列出最近的 CSV 文件"""
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    search_path = os.path.join(base_dir, 'ATO-result', '**', '*.csv')
+    search_path = os.path.join(base_dir, 'DCA-result', '**', '*.csv')
     
     files = glob.glob(search_path, recursive=True)
     if not files:
@@ -26,7 +26,7 @@ def generate_multi_comparison_plots():
 
     csv_files = get_all_csv_files()
     if not csv_files:
-        print("❌ 未在 ATO-result 目录中找到任何 CSV 数据文件！")
+        print("❌ 未在 DCA-result 目录中找到任何 CSV 数据文件！")
         return
 
     print("\n[*] 发现以下最近的实验数据：")
@@ -56,23 +56,23 @@ def generate_multi_comparison_plots():
     for f in selected_files:
         dfs.append(pd.read_csv(f))
 
-    # 🎯 核心逻辑：从文件名中侦测 ATO 的专属安全基线
+    # 🎯 核心逻辑：从文件名中侦测 DCA 的专属安全基线
     target_baseline = 0.3 # 默认 baseline
     for f in selected_files:
         fname = os.path.basename(f)
-        if "ATO" in fname and "_SD" in fname:
+        if "DCA" in fname and "_SD" in fname:
             try:
                 # 提取形如 _SD0.40.csv 中的 0.40
                 sd_str = fname.split("_SD")[1].replace(".csv", "")
                 target_baseline = float(sd_str)
-                print(f"[*] 🔍 侦测到 ATO 数据，已强制同步图表安全基线为: {target_baseline}m")
-                break # 采纳查找到的第一个 ATO 基线
+                print(f"[*] 🔍 侦测到 DCA 数据，已强制同步图表安全基线为: {target_baseline}m")
+                break # 采纳查找到的第一个 DCA 基线
             except Exception:
                 pass
 
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    new_target_dir = os.path.join(base_dir, 'ATO-result', f"{timestamp}_MultiComparison")
+    new_target_dir = os.path.join(base_dir, 'DCA-result', f"{timestamp}_MultiComparison")
     os.makedirs(new_target_dir, exist_ok=True)
     print(f"[*] 📁 创建图表输出目录: {new_target_dir}")
 

@@ -26,10 +26,10 @@ class APFSwarmController():
         self.p_cohesion = p_cohesion
 
         # =================================================================
-        # 🧠 [ATO 模块引入]: 全局开关
+        # 🧠 [DCA 模块引入]: 全局开关
         # 对比 baseline: 原版只有贪心算法，这里引入了基于 LLM 拓扑优化的状态标志。
         # =================================================================
-        self.enable_ato = False  
+        self.enable_dca = False  
         
         self.log_dir = ""            
         self.current_log_name = ""   
@@ -89,7 +89,7 @@ class APFSwarmController():
         print(f"\n[SRM] Safe Return Activated. {m} active drones returning. Est. time: {self.return_duration:.1f}s")
 
     # =================================================================
-    # 🧠 [ATO + FMS 混合模块]: 重构的目标分配器
+    # 🧠 [DCA + FMS 混合模块]: 重构的目标分配器
     # =================================================================
     def distribute_goals(self, start, goals, shape_num=None, active_num=None):
         if shape_num is None: shape_num = len(goals)
@@ -106,7 +106,7 @@ class APFSwarmController():
             shape_goals = active_goals[:shape_num]
             rtb_goals = active_goals[shape_num:]
 
-            if self.enable_ato and shape_num > 1:
+            if self.enable_dca and shape_num > 1:
                 shape_goals = shape_goals + np.random.normal(0, 1e-3, shape_goals.shape) 
                 
                 dist_matrix_llm = cdist(shape_goals, shape_goals)
@@ -161,7 +161,7 @@ class APFSwarmController():
                 
                 for r, c in zip(row_ind, col_ind):
                     out_goals[r] = scaled_active_goals[c]
-                print(f"\n[ATO] Adaptive Topology (Scale: {scale:.2f}). Shape drones: {shape_num}")
+                print(f"\n[DCA] Dynamic Configuration Assignment (Scale: {scale:.2f}). Shape drones: {shape_num}")
                 
             else:
                 dist_matrix = cdist(active_start, active_goals)
@@ -311,22 +311,22 @@ class APFSwarmController():
 
     def generate_plots(self):
         if not self.last_csv_path or not os.path.exists(self.last_csv_path): return
-        mode_prefix = "ATO" if self.enable_ato else "Base"
-        algo_label = "ATO (Ours)" if self.enable_ato else "Baseline"
+        mode_prefix = "DCA" if self.enable_dca else "Base"
+        algo_label = "DCA (Ours)" if self.enable_dca else "Baseline"
 
         print(f"\n[*] Generating plots for [{algo_label}] mode...")
         try:
             df = pd.read_csv(self.last_csv_path)
             metrics = {
-                'Target_Error(m)': ('Convergence Error Comparison', 'Mean Error (m)', '#2ECC71' if self.enable_ato else '#E74C3C'),
-                'Min_Distance(m)': ('Minimum Distance Comparison', 'Min Distance (m)', '#2ECC71' if self.enable_ato else '#E74C3C'),
-                'Avg_Velocity(m/s)': ('Average Velocity Comparison', 'Avg Velocity (m/s)', '#2ECC71' if self.enable_ato else '#E74C3C')
+                'Target_Error(m)': ('Convergence Error Comparison', 'Mean Error (m)', '#2ECC71' if self.enable_dca else '#E74C3C'),
+                'Min_Distance(m)': ('Minimum Distance Comparison', 'Min Distance (m)', '#2ECC71' if self.enable_dca else '#E74C3C'),
+                'Avg_Velocity(m/s)': ('Average Velocity Comparison', 'Avg Velocity (m/s)', '#2ECC71' if self.enable_dca else '#E74C3C')
             }
             for col, (title, ylabel, color) in metrics.items():
                 if col in df.columns:
                     plt.figure(figsize=(9, 5.5))
-                    plt.plot(df['Time(s)'], df[col], linewidth=2.5 if self.enable_ato else 1.5, 
-                             color=color, linestyle='-' if self.enable_ato else '--', 
+                    plt.plot(df['Time(s)'], df[col], linewidth=2.5 if self.enable_dca else 1.5, 
+                             color=color, linestyle='-' if self.enable_dca else '--', 
                              label=algo_label, alpha=0.9)
                     
                     if col == 'Target_Error(m)':
