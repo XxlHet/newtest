@@ -79,7 +79,7 @@ class SwarmControllerNode():
         
         timestamp = time.strftime("%Y%m%d_%H%M%S")
         base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        self.save_dir = os.path.join(base_dir, 'result', timestamp)
+        self.save_dir = os.path.join(base_dir, 'ATO-result', timestamp)
         os.makedirs(self.save_dir, exist_ok=True)
         
         print("\n" + "="*60)
